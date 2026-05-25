@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>规则管理 - 可疑进程行为分析</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <h2 class="sidebar-title">进程风险分析</h2>
+        <ul class="nav-list">
+            <li class="nav-item"><a href="/">仪表盘</a></li>
+            <li class="nav-item"><a href="/processes">进程列表</a></li>
+            <li class="nav-item active"><a href="/rules">规则管理</a></li>
+            <li class="nav-item"><a href="/history">历史记录</a></li>
+        </ul>
+    </nav>
+    <main class="content">
+        <h1>规则管理</h1>
+        <table class="data-table" id="rules-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>类别</th>
+                    <th>名称</th>
+                    <th>描述</th>
+                    <th>权重</th>
+                    <th>分值</th>
+                    <th>类型</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody id="rules-tbody"></tbody>
+        </table>
+        <h2 style="margin-top:32px">添加自定义规则</h2>
+        <form id="add-rule-form" class="form">
+            <div class="form-group">
+                <label>类别</label>
+                <input type="text" name="category" placeholder="如：网络异常" required>
+            </div>
+            <div class="form-group">
+                <label>名称</label>
+                <input type="text" name="name" placeholder="规则名称" required>
+            </div>
+            <div class="form-group">
+                <label>描述</label>
+                <textarea name="description" placeholder="规则描述"></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>权重</label>
+                    <input type="number" name="weight" step="0.1" value="1.0" required>
+                </div>
+                <div class="form-group">
+                    <label>分值</label>
+                    <input type="number" name="score" value="10" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">添加规则</button>
+        </form>
+    </main>
+    <script src="/static/js/rules.js"></script>
+</body>
+</html>

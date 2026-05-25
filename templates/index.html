@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>可疑进程行为分析与风险评分系统</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <nav class="sidebar">
+        <h2 class="sidebar-title">进程风险分析</h2>
+        <ul class="nav-list">
+            <li class="nav-item active"><a href="/">仪表盘</a></li>
+            <li class="nav-item"><a href="/processes">进程列表</a></li>
+            <li class="nav-item"><a href="/rules">规则管理</a></li>
+            <li class="nav-item"><a href="/history">历史记录</a></li>
+        </ul>
+    </nav>
+    <main class="content">
+        <div class="page-header">
+            <h1>仪表盘</h1>
+            <div class="header-actions">
+                <span id="schedule-status" class="schedule-badge">巡检: 加载中</span>
+                <button class="btn btn-primary" id="scan-btn">立即扫描</button>
+            </div>
+        </div>
+        <div class="schedule-panel" id="schedule-panel">
+            <label>定时巡检间隔:</label>
+            <select id="schedule-interval">
+                <option value="5">5 分钟</option>
+                <option value="10">10 分钟</option>
+                <option value="30" selected>30 分钟</option>
+                <option value="60">1 小时</option>
+            </select>
+            <button class="btn btn-sm btn-primary" id="schedule-update-btn">更新</button>
+            <button class="btn btn-sm" id="schedule-stop-btn">停止</button>
+            <button class="btn btn-sm btn-primary" id="schedule-start-btn" style="display:none">启动</button>
+        </div>
+        <div class="stats-cards">
+            <div class="card">
+                <span class="card-value" id="total-count">--</span>
+                <span class="card-label">进程总数</span>
+            </div>
+            <div class="card card-critical">
+                <span class="card-value" id="critical-count">0</span>
+                <span class="card-label">极高风险</span>
+            </div>
+            <div class="card card-high">
+                <span class="card-value" id="high-count">0</span>
+                <span class="card-label">高风险</span>
+            </div>
+            <div class="card card-medium">
+                <span class="card-value" id="medium-count">0</span>
+                <span class="card-label">中风险</span>
+            </div>
+            <div class="card">
+                <span class="card-value" id="low-count">0</span>
+                <span class="card-label">低风险</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="chart-box">
+                <h3>风险等级分布</h3>
+                <canvas id="pie-chart"></canvas>
+            </div>
+            <div class="chart-box">
+                <h3>风险趋势</h3>
+                <canvas id="trend-chart"></canvas>
+            </div>
+        </div>
+        <div class="chart-box">
+            <h3>最近扫描高风险进程</h3>
+            <table class="data-table" id="top-risk-table">
+                <thead>
+                    <tr><th>PID</th><th>进程名</th><th>路径</th><th>风险分值</th><th>风险等级</th><th>操作</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </main>
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

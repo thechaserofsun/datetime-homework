@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>进程详情 - 可疑进程行为分析</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <h2 class="sidebar-title">进程风险分析</h2>
+        <ul class="nav-list">
+            <li class="nav-item"><a href="/">仪表盘</a></li>
+            <li class="nav-item active"><a href="/processes">进程列表</a></li>
+            <li class="nav-item"><a href="/rules">规则管理</a></li>
+            <li class="nav-item"><a href="/history">历史记录</a></li>
+        </ul>
+    </nav>
+    <main class="content">
+        <div class="page-header">
+            <h1>进程详情</h1>
+            <a class="btn btn-sm" href="/processes">返回列表</a>
+        </div>
+
+        <!-- 基本信息 -->
+        <div class="detail-section" id="info-section">
+            <h3>基本信息</h3>
+            <div id="info-grid" class="info-grid"></div>
+        </div>
+
+        <!-- 进程树 -->
+        <div class="detail-section">
+            <h3>进程关系</h3>
+            <div id="process-tree"></div>
+        </div>
+
+        <!-- 网络连接 + DLL 并排 -->
+        <div class="row">
+            <div class="detail-section" style="flex:1">
+                <h3>网络连接</h3>
+                <table class="data-table" id="conn-table">
+                    <thead><tr><th>远端IP</th><th>远端端口</th><th>状态</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="detail-section" style="flex:1">
+                <h3>加载的DLL</h3>
+                <ul id="dll-list" class="compact-list"></ul>
+            </div>
+        </div>
+
+        <!-- 打开的文件 -->
+        <div class="detail-section">
+            <h3>打开的文件</h3>
+            <ul id="file-list" class="compact-list"></ul>
+        </div>
+
+        <!-- 命中规则 -->
+        <div class="detail-section">
+            <h3>命中规则</h3>
+            <table class="data-table" id="rule-hit-table">
+                <thead><tr><th>规则类别</th><th>规则名称</th><th>加权分值</th><th>命中详情</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- 风险报告（五小节法） -->
+        <div class="detail-section" id="risk-report-section" style="display:none">
+            <h3>风险报告</h3>
+            <div id="risk-report"></div>
+        </div>
+
+        <!-- 预防措施 -->
+        <div class="detail-section" id="prevention-section" style="display:none">
+            <h3>预防措施建议</h3>
+            <div id="prevention-content"></div>
+        </div>
+    </main>
+    <script src="/static/js/detail.js"></script>
+</body>
+</html>

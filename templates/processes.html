@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>进程列表 - 可疑进程行为分析</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <h2 class="sidebar-title">进程风险分析</h2>
+        <ul class="nav-list">
+            <li class="nav-item"><a href="/">仪表盘</a></li>
+            <li class="nav-item active"><a href="/processes">进程列表</a></li>
+            <li class="nav-item"><a href="/rules">规则管理</a></li>
+            <li class="nav-item"><a href="/history">历史记录</a></li>
+        </ul>
+    </nav>
+    <main class="content">
+        <h1>进程列表</h1>
+        <div class="toolbar">
+            <select id="level-filter">
+                <option value="">全部等级</option>
+                <option value="critical">极高风险</option>
+                <option value="high">高风险</option>
+                <option value="medium">中风险</option>
+                <option value="low">低风险</option>
+            </select>
+            <input type="text" id="search-input" placeholder="搜索进程名或PID...">
+            <button class="btn btn-primary btn-sm" id="filter-btn">筛选</button>
+        </div>
+        <table class="data-table" id="process-table">
+            <thead>
+                <tr>
+                    <th>PID</th>
+                    <th>进程名</th>
+                    <th>路径</th>
+                    <th>用户</th>
+                    <th>风险分值</th>
+                    <th>风险等级</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="process-tbody"></tbody>
+        </table>
+        <div class="pagination" id="pagination"></div>
+    </main>
+    <script src="/static/js/processes.js"></script>
+</body>
+</html>
