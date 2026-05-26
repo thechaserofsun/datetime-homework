@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>可疑进程行为分析与风险评分系统</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/style.css?v=3">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -22,7 +22,7 @@
             <h1>仪表盘</h1>
             <div class="header-actions">
                 <span id="schedule-status" class="schedule-badge">巡检: 加载中</span>
-                <button class="btn btn-primary" id="scan-btn">立即扫描</button>
+                <button class="btn btn-primary" id="scan-btn" onclick="startScan()">立即扫描</button>
             </div>
         </div>
         <div class="schedule-panel" id="schedule-panel">
@@ -79,6 +79,14 @@
             </table>
         </div>
     </main>
-    <script src="/static/js/dashboard.js"></script>
+    <!-- 扫描遮罩层 -->
+    <div class="scan-overlay" id="scan-overlay">
+        <div class="scan-modal">
+            <div class="scan-spinner"></div>
+            <div class="scan-modal-text" id="scan-modal-text">正在扫描进程...</div>
+            <div class="scan-modal-sub" id="scan-modal-sub">请稍候，采集与评分需要一些时间</div>
+        </div>
+    </div>
+    <script src="/static/js/dashboard.js?v=3"></script>
 </body>
 </html>

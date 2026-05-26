@@ -1,8 +1,70 @@
+// ========== 全局扫描函数（onclick 直接调用，确保可靠） ==========
+var _scanRunning = false;
+
+function startScan() {
+    if (_scanRunning) return;
+    _scanRunning = true;
+
+    var btn = document.getElementById("scan-btn");
+    var overlay = document.getElementById("scan-overlay");
+    var modalText = document.getElementById("scan-modal-text");
+    var modalSub = document.getElementById("scan-modal-sub");
+
+    // 按钮立即反馈
+    btn.disabled = true;
+    btn.textContent = "扫描中...";
+    btn.style.opacity = "0.6";
+
+    // 遮罩层
+    if (overlay) {
+        overlay.style.display = "flex";
+        if (modalText) modalText.textContent = "正在采集进程信息...";
+        if (modalSub) modalSub.textContent = "请稍候，采集与评分需要一些时间";
+    }
+
+    fetch("/api/scan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ trigger: "manual" })
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (res) {
+        _scanRunning = false;
+        btn.disabled = false;
+        btn.textContent = "立即扫描";
+        btn.style.opacity = "1";
+
+        if (res.status === "ok") {
+            if (overlay) {
+                if (modalText) modalText.textContent = "扫描完成!";
+                if (modalSub) modalSub.textContent = "共 " + res.data.total_processes + " 个进程，高风险 " + res.data.high_risk_count + " 个";
+            }
+            setTimeout(function () {
+                if (overlay) overlay.style.display = "none";
+                loadDashboard();
+                loadTrend();
+            }, 1200);
+        } else {
+            if (overlay) overlay.style.display = "none";
+            alert("扫描失败: " + (res.message || "未知错误"));
+        }
+    })
+    .catch(function (e) {
+        _scanRunning = false;
+        btn.disabled = false;
+        btn.textContent = "立即扫描";
+        btn.style.opacity = "1";
+        if (overlay) overlay.style.display = "none";
+        alert("扫描失败，请检查后端服务\n" + e);
+    });
+}
+
+// ========== 页面逻辑 ==========
 (function () {
     var pieChart = null;
     var trendChart = null;
 
-    function loadDashboard() {
+    window.loadDashboard = function () {
         fetch("/api/processes")
             .then(function (r) { return r.json(); })
             .then(function (res) {
@@ -20,18 +82,22 @@
                 if (procs.length === 0) {
                     document.getElementById("total-count").textContent = "--";
                     var tbody = document.querySelector("#top-risk-table tbody");
-                    tbody.innerHTML = "<tr><td colspan=\"6\" style=\"text-align:center;color:#999\">暂无扫描数据，请点击"立即扫描"</td></tr>";
+                    tbody.innerHTML = "<tr><td colspan=\"6\" style=\"text-align:center;color:#999\">暂无扫描数据，请点击立即扫描</td></tr>";
                     return;
                 }
 
                 renderPieChart(counts);
                 renderTopRiskTable(procs.slice(0, 10));
-            });
-    }
+            })
+            .catch(function (e) { console.error("loadDashboard error:", e); });
+    };
 
     function renderPieChart(counts) {
-        var ctx = document.getElementById("pie-chart").getContext("2d");
+        var el = document.getElementById("pie-chart");
+        if (!el) return;
+        var ctx = el.getContext("2d");
         if (pieChart) pieChart.destroy();
+        if (typeof Chart === "undefined") return;
         pieChart = new Chart(ctx, {
             type: "doughnut",
             data: {
@@ -43,14 +109,12 @@
             },
             options: {
                 responsive: true,
-                plugins: {
-                    legend: { position: "bottom" },
-                },
+                plugins: { legend: { position: "bottom" } },
             },
         });
     }
 
-    function loadTrend() {
+    window.loadTrend = function () {
         fetch("/api/trend")
             .then(function (r) { return r.json(); })
             .then(function (res) {
@@ -59,8 +123,11 @@
                 var highData = res.data.map(function (d) { return d.high_risk_count; });
                 var totalData = res.data.map(function (d) { return d.total_processes; });
 
-                var ctx = document.getElementById("trend-chart").getContext("2d");
+                var el = document.getElementById("trend-chart");
+                if (!el) return;
+                var ctx = el.getContext("2d");
                 if (trendChart) trendChart.destroy();
+                if (typeof Chart === "undefined") return;
                 trendChart = new Chart(ctx, {
                     type: "line",
                     data: {
@@ -90,11 +157,13 @@
                         plugins: { legend: { position: "bottom" } },
                     },
                 });
-            });
-    }
+            })
+            .catch(function (e) { console.error("loadTrend error:", e); });
+    };
 
     function renderTopRiskTable(procs) {
         var tbody = document.querySelector("#top-risk-table tbody");
+        if (!tbody) return;
         tbody.innerHTML = "";
         procs.forEach(function (p) {
             if (p.risk_score === 0) return;
@@ -130,7 +199,8 @@
                     document.getElementById("schedule-start-btn").style.display = "";
                 }
                 document.getElementById("schedule-interval").value = d.interval_minutes;
-            });
+            })
+            .catch(function (e) { console.error("loadScheduleStatus error:", e); });
     }
 
     // 更新间隔
@@ -141,13 +211,13 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ interval_minutes: minutes, action: "update" }),
         })
-            .then(function (r) { return r.json(); })
-            .then(function (res) {
-                if (res.status === "ok") {
-                    alert("巡检间隔已更新为 " + res.data.interval_minutes + " 分钟");
-                    loadScheduleStatus();
-                }
-            });
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+            if (res.status === "ok") {
+                alert("巡检间隔已更新为 " + res.data.interval_minutes + " 分钟");
+                loadScheduleStatus();
+            }
+        });
     });
 
     // 停止巡检
@@ -157,8 +227,8 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ action: "stop" }),
         })
-            .then(function (r) { return r.json(); })
-            .then(function () { loadScheduleStatus(); });
+        .then(function (r) { return r.json(); })
+        .then(function () { loadScheduleStatus(); });
     });
 
     // 启动巡检
@@ -169,44 +239,19 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ interval_minutes: minutes, action: "start" }),
         })
-            .then(function (r) { return r.json(); })
-            .then(function () { loadScheduleStatus(); });
-    });
-
-    // ========== 扫描按钮 ==========
-    var scanBtn = document.getElementById("scan-btn");
-    scanBtn.addEventListener("click", function () {
-        scanBtn.disabled = true;
-        scanBtn.textContent = "扫描中...";
-        fetch("/api/scan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ trigger: "manual" }) })
-            .then(function (r) { return r.json(); })
-            .then(function (res) {
-                scanBtn.disabled = false;
-                scanBtn.textContent = "立即扫描";
-                if (res.status === "ok") {
-                    alert("扫描完成：共 " + res.data.total_processes + " 个进程，高风险 " + res.data.high_risk_count + " 个");
-                    loadDashboard();
-                    loadTrend();
-                }
-            })
-            .catch(function () {
-                scanBtn.disabled = false;
-                scanBtn.textContent = "立即扫描";
-                alert("扫描失败，请检查后端服务");
-            });
+        .then(function (r) { return r.json(); })
+        .then(function () { loadScheduleStatus(); });
     });
 
     // 工具函数
     function levelLabel(l) {
         return { low: "低", medium: "中", high: "高", critical: "极高" }[l] || l;
     }
-
     function escapeHtml(s) {
         var div = document.createElement("div");
         div.textContent = s;
         return div.innerHTML;
     }
-
     function truncate(s, n) {
         return s.length > n ? s.substring(0, n) + "..." : s;
     }

@@ -53,10 +53,13 @@
 
         grid.innerHTML = items.map(function (it) {
             var val = it[1];
+            var valHtml;
             if (it[0] === "风险等级") {
-                val = "<span class=\"level-tag " + val + "\">" + levelLabel(val) + "</span>";
+                valHtml = "<span class=\"level-tag " + val + "\">" + levelLabel(val) + "</span>";
+            } else {
+                valHtml = escapeHtml(String(val));
             }
-            return "<div class=\"info-item\"><span class=\"info-label\">" + it[0] + "</span><span class=\"info-value\">" + escapeHtml(String(val)) + "</span></div>";
+            return "<div class=\"info-item\"><span class=\"info-label\">" + it[0] + "</span><span class=\"info-value\">" + valHtml + "</span></div>";
         }).join("");
     }
 
